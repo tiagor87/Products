@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="nunit" Version="3.10.1"/>
+    <PackageReference Include="NUnit3TestAdapter" Version="3.10.0"/>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.7.2"/>
+    <PackageReference Include="MongoDB.Driver" Version="2.7.0"/>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Domain\Products.Domain.csproj"/>
+    <ProjectReference Include="..\..\src\Infrastructure\Products.Infrastructure.csproj"/>
+  </ItemGroup>
+</Project>

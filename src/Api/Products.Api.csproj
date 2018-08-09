@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="wwwroot\"/>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Domain\Products.Domain.csproj"/>
+    <ProjectReference Include="..\Infrastructure\Products.Infrastructure.csproj"/>
+    <ProjectReference Include="..\Application\Products.Application.csproj"/>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.App"/>
+    <PackageReference Include="MongoDB.Driver" Version="2.7.0"/>
+  </ItemGroup>
+</Project>
