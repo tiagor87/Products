@@ -11,7 +11,7 @@ using Products.Domain.Exceptions;
 using Products.Domain.Models;
 using Products.Domain.Repositories;
 
-namespace Products.Application.Tests.Services
+namespace Products.Tests.Application.Services
 {
     [TestFixture]
     public class ProductAppServiceTest {

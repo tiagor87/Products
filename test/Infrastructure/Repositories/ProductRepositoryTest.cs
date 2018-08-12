@@ -12,7 +12,7 @@ using Products.Infrastructure.Exceptions;
 using Products.Infrastructure.Providers;
 using Products.Infrastructure.Repositories;
 
-namespace Products.Infrastructure.Tests.Repositories
+namespace Products.Tests.Infrastructure.Repositories
 {
     public class ProductRepositoryTest {
         private IProductRepository productRepository;

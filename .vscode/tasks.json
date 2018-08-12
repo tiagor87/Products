@@ -5,9 +5,10 @@
     "tasks": [
         {
             "label": "build",
-            "command": "dotnet build",
+            "command": "dotnet",
             "type": "shell",
             "group": "build",
+            "args": ["build", "${workspaceFolder}/src/Api/Products.Api.csproj"],
             "presentation": {
                 "reveal": "silent"
             },

@@ -4,7 +4,7 @@ using NUnit.Framework;
 using Products.Domain.Exceptions;
 using Products.Domain.Models;
 
-namespace Products.Domain.Tests.Models
+namespace Products.Tests.Domain.Models
 {
     [TestFixture]
     public class ProductTest

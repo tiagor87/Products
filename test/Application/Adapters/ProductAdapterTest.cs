@@ -3,7 +3,7 @@ using Products.Application.Adapters;
 using Products.Application.Contracts;
 using Products.Domain.Models;
 
-namespace Products.Application.Tests.Adapters
+namespace Products.Tests.Application.Adapters
 {
     [TestFixture]
     public class ProductAdapterTest {
