@@ -1,6 +1,7 @@
 using System;
 using Moq;
 using NUnit.Framework;
+using Products.Domain.Exceptions;
 using Products.Domain.Models;
 
 namespace Products.Domain.Tests.Models
@@ -9,9 +10,9 @@ namespace Products.Domain.Tests.Models
     public class ProductTest
     {
         [Test]
-        [TestCase(null, 10, typeof(ProductNameIsInvalidException))]
-        [TestCase("Product", 0, typeof(ProductValueIsInvalidException))]
-        [TestCase("Product", -1, typeof(ProductValueIsInvalidException))]
+        [TestCase(null, 10, typeof(ProductNameInvalidException))]
+        [TestCase("Product", 0, typeof(ProductValueInvalidException))]
+        [TestCase("Product", -1, typeof(ProductValueInvalidException))]
         public void ShouldThrowExceptionWhenProductIsInvalid(string name, decimal value, Type exceptionType)
         {
             var product = new Product(name, value);

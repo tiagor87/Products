@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using NUnit.Framework;
+using Products.Domain.Exceptions;
 using Products.Domain.Models;
 
 namespace Products.Domain.Tests.Models

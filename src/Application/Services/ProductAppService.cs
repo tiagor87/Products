@@ -5,12 +5,13 @@ using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Products.Application.Adapters;
 using Products.Application.Contracts;
+using Products.Application.Exceptions;
 using Products.Domain.Models;
 using Products.Domain.Repositories;
 
 namespace Products.Application.Services
 {
-    public class ProductAppService {
+    public class ProductAppService : IProductAppService {
         private readonly IProductRepository productRepository;
         private readonly IAdapter<ProductContract, Product> adapter;
 
@@ -29,7 +30,7 @@ namespace Products.Application.Services
             return this.productRepository.Add(product).Id;
         }
 
-        public void Edit(int id, ProductContract contract) {
+        public void Edit(object id, ProductContract contract) {
             if (contract == null) {
                 throw new ProductIsNullException();
             }
@@ -72,41 +73,6 @@ namespace Products.Application.Services
             }
 
             this.productRepository.Delete(id);
-        }
-    }
-
-    public class PageInvalidException : ArgumentException {
-        private const string MESSAGE = "Page must be greater than zero";
-        
-        public PageInvalidException() : base(MESSAGE)
-        {
-        }
-    }
-
-    public class ProductNotFoundException : Exception
-    {
-        private const string MESSAGE = "Product {0} not found.";
-
-        public ProductNotFoundException(object id) : base(string.Format(MESSAGE, id))
-        {
-        }
-    }
-
-    public class ProductIdIsInvalidException : ArgumentException
-    {
-        private const string MESSAGE = "Product ID must be given.";
-
-        public ProductIdIsInvalidException() : base(MESSAGE)
-        {
-        }
-    }
-
-    public class ProductIsNullException : ArgumentException
-    {
-        private const string MESSAGE = "Product must be given.";
-
-        public ProductIsNullException() : base(MESSAGE)
-        {
         }
     }
 }

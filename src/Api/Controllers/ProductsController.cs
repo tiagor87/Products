@@ -5,8 +5,11 @@ using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Products.Application.Contracts;
+using Products.Application.Exceptions;
 using Products.Application.Services;
+using Products.Domain.Exceptions;
 using Products.Domain.Models;
+using Products.Infrastructure.Exceptions;
 
 namespace Products.Api.Controllers
 {
@@ -14,9 +17,9 @@ namespace Products.Api.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        private readonly ProductAppService productAppService;
+        private readonly IProductAppService productAppService;
 
-        public ProductsController(ProductAppService productAppService)
+        public ProductsController(IProductAppService productAppService)
         {
             this.productAppService = productAppService;
         }
@@ -34,7 +37,7 @@ namespace Products.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        public ActionResult<ProductContract> Get(int id)
+        public ActionResult<ProductContract> Get(string id)
         {
             return StatusCode((int) HttpStatusCode.OK, this.productAppService.GetById(id));
         }
@@ -46,14 +49,14 @@ namespace Products.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        public ActionResult Put(int id, [FromBody] ProductContract contract)
+        public ActionResult Put(string id, [FromBody] ProductContract contract)
         {
             this.productAppService.Edit(id, contract);
             return StatusCode((int) HttpStatusCode.OK);
         }
 
         [HttpDelete("{id}")]
-        public ActionResult Delete(int id)
+        public ActionResult Delete(string id)
         {
             this.productAppService.Delete(id);
             return StatusCode((int) HttpStatusCode.NoContent);

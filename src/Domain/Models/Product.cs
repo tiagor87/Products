@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.Serialization;
+using Products.Domain.Exceptions;
 
 namespace Products.Domain.Models
 {
@@ -38,31 +39,11 @@ namespace Products.Domain.Models
 
         public void Validate() {
             if (string.IsNullOrWhiteSpace(this.Name)) {
-                throw new ProductNameIsInvalidException();
+                throw new ProductNameInvalidException();
             }
             if (this.Value <= 0) {
-                throw new ProductValueIsInvalidException();
+                throw new ProductValueInvalidException();
             }
-        }
-    }
-
-    [Serializable]
-    public class ProductValueIsInvalidException : Exception
-    {
-        private const string MESSAGE = "The product's value must be greater than zero.";
-
-        public ProductValueIsInvalidException() : base(MESSAGE)
-        {
-        }
-    }
-
-    [Serializable]
-    public class ProductNameIsInvalidException : Exception
-    {
-        private const string MESSAGE = "The product's name must be defined.";
-        
-        public ProductNameIsInvalidException() : base(MESSAGE)
-        {
         }
     }
 }

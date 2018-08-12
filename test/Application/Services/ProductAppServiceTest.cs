@@ -5,7 +5,9 @@ using Moq;
 using NUnit.Framework;
 using Products.Application.Adapters;
 using Products.Application.Contracts;
+using Products.Application.Exceptions;
 using Products.Application.Services;
+using Products.Domain.Exceptions;
 using Products.Domain.Models;
 using Products.Domain.Repositories;
 
@@ -15,7 +17,7 @@ namespace Products.Application.Tests.Services
     public class ProductAppServiceTest {
         private Mock<IProductRepository> productRepositoryMock;
         private Mock<IAdapter<ProductContract, Product>> adapterMock;
-        private ProductAppService service;
+        private IProductAppService service;
 
         [SetUp]
         public void SetUp() {
@@ -24,59 +26,55 @@ namespace Products.Application.Tests.Services
             this.service = new ProductAppService(this.productRepositoryMock.Object, this.adapterMock.Object);
         }
 
-        [TearDown]
-        public void TearDown() {
-        }
-
         [Test]
         public void ShouldFailToAddAProductWhenNoContractIsGiven() {
             Assert.Throws(typeof(ProductIsNullException), () => this.service.Add(null));
         }
 
         [Test]
-        [TestCase(null, 10, typeof(ProductNameIsInvalidException))]
-        [TestCase("Product", 0, typeof(ProductValueIsInvalidException))]
-        [TestCase("Product", -1, typeof(ProductValueIsInvalidException))]
+        [TestCase(null, 10, typeof(ProductNameInvalidException))]
+        [TestCase("Product", 0, typeof(ProductValueInvalidException))]
+        [TestCase("Product", -1, typeof(ProductValueInvalidException))]
         public void ShouldValidateProductBeforeAdd(string name, decimal value, Type exceptionType) {
-            var contract = new ProductContract {
+            var stub = new ProductContract {
                 Name = name,
                 Value = value
             };
-            this.adapterMock.Setup(m => m.Convert(contract)).Returns(new Product(name, value)).Verifiable();
+            this.adapterMock.Setup(m => m.Convert(stub)).Returns(new Product(name, value)).Verifiable();
             
-            Assert.Throws(exceptionType, () => this.service.Add(contract));
+            Assert.Throws(exceptionType, () => this.service.Add(stub));
 
-            this.adapterMock.Verify(m => m.Convert(contract), Times.Once());
+            this.adapterMock.Verify(m => m.Convert(stub), Times.Once());
         }
 
         [Test]
         [TestCase("Product", 10)]
         public void ShouldBeAbleToAddAProduct(string name, decimal value) {
-            var contract = new ProductContract {
+            var stub = new ProductContract {
                 Name = name,
                 Value = value
             };
-            this.adapterMock.Setup(m => m.Convert(contract)).Returns(new Product(name, value)).Verifiable();
+            this.adapterMock.Setup(m => m.Convert(stub)).Returns(new Product(name, value)).Verifiable();
             this.productRepositoryMock.Setup(m => m.Add(It.IsAny<Product>())).Returns(new Product(1, name, value)).Verifiable();
             
-            var id = this.service.Add(contract);
+            var id = this.service.Add(stub);
             Assert.AreEqual(1, id);
 
-            this.adapterMock.Verify(m => m.Convert(contract), Times.Once());
+            this.adapterMock.Verify(m => m.Convert(stub), Times.Once());
             this.productRepositoryMock.Verify(m => m.Add(It.IsAny<Product>()), Times.Once());
         }
 
         [Test]
         [TestCase("Product", 10)]
         public void ShouldBeAbleToEditAProduct(string name, decimal value) {
-            var contract = new ProductContract {
+            var stub = new ProductContract {
                 Name = name,
                 Value = value
             };
             this.productRepositoryMock.Setup(m => m.GetById(1)).Returns(new Product(1, "name", 20)).Verifiable();
-            this.productRepositoryMock.Setup(m => m.Edit(It.IsAny<Product>())).Returns(new Product(1, name, value)).Verifiable();
+            this.productRepositoryMock.Setup(m => m.Edit(It.IsAny<Product>())).Verifiable();
             
-            this.service.Edit(1, contract);
+            this.service.Edit(1, stub);
 
             this.productRepositoryMock.Verify(m => m.GetById(1), Times.Once());
             this.productRepositoryMock.Verify(m => m.Edit(It.Is<Product>(p => p.Id.Equals(1) && p.Name.Equals(name) && p.Value.Equals(value))), Times.Once());
@@ -103,16 +101,16 @@ namespace Products.Application.Tests.Services
         [TestCase(2)]
         [TestCase(3)]
         public void ShouldBeAbleToGetAProductById(object id) {
-            var product = new Product(id, "name", 20);
-            var contract = new ProductContract();
-            this.productRepositoryMock.Setup(m => m.GetById(id)).Returns(product).Verifiable();
-            this.adapterMock.Setup(m => m.Convert(product)).Returns(contract).Verifiable();
+            var productStub = new Product(id, "name", 20);
+            var contractStub = new ProductContract();
+            this.productRepositoryMock.Setup(m => m.GetById(id)).Returns(productStub).Verifiable();
+            this.adapterMock.Setup(m => m.Convert(productStub)).Returns(contractStub).Verifiable();
             
             var response = this.service.GetById(id);
-            Assert.AreSame(contract, response);
+            Assert.AreSame(contractStub, response);
 
             this.productRepositoryMock.Verify(m => m.GetById(id), Times.Once());
-            this.adapterMock.Verify(m => m.Convert(product), Times.Once());
+            this.adapterMock.Verify(m => m.Convert(productStub), Times.Once());
         }
 
         [Test]
@@ -135,18 +133,18 @@ namespace Products.Application.Tests.Services
 
         [Test]
         public void ShouldBeAbleToGetAllProducts() {
-            var products = new List<Product> {
+            var listStub = new List<Product> {
                 new Product(1, "Product 1", 10),
                 new Product(2, "Product 2", 20)
             };
-            var contract = new ProductContract();
-            this.productRepositoryMock.Setup(m => m.All()).Returns(products.AsQueryable()).Verifiable();
-            this.adapterMock.Setup(m => m.Convert(It.IsAny<Product>())).Returns(contract).Verifiable();
+            var contractStub = new ProductContract();
+            this.productRepositoryMock.Setup(m => m.All()).Returns(listStub.AsQueryable()).Verifiable();
+            this.adapterMock.Setup(m => m.Convert(It.IsAny<Product>())).Returns(contractStub).Verifiable();
             
             var response = this.service.All();
             Assert.AreEqual(2, response.Count());
-            Assert.AreSame(contract, response.First());
-            Assert.AreSame(contract, response.Last());
+            Assert.AreSame(contractStub, response.First());
+            Assert.AreSame(contractStub, response.Last());
 
             this.productRepositoryMock.Verify(m => m.All(), Times.Once());
             this.adapterMock.Verify(m => m.Convert(It.IsAny<Product>()), Times.Exactly(2));
@@ -164,18 +162,18 @@ namespace Products.Application.Tests.Services
         [TestCase(2)]
         [TestCase(10)]
         public void ShouldBeAbleToGetProductsByPage(int page) {
-            var pageResult = new PageResult<Product>(10, page, new List<Product>{ new Product(1, "Product", 10) });
-            var contract = new ProductContract();
-            this.productRepositoryMock.Setup(m => m.GetPage(page)).Returns(pageResult).Verifiable();
-            this.adapterMock.Setup(m => m.Convert(It.IsAny<Product>())).Returns(contract).Verifiable();
+            var pageResultStub = new PageResult<Product>(10, page, new List<Product>{ new Product(1, "Product", 10) });
+            var contractStub = new ProductContract();
+            this.productRepositoryMock.Setup(m => m.GetPage(page)).Returns(pageResultStub).Verifiable();
+            this.adapterMock.Setup(m => m.Convert(It.IsAny<Product>())).Returns(contractStub).Verifiable();
             
             var result = this.service.GetPage(page);
-            Assert.AreEqual(pageResult.CurrentPage, result.CurrentPage);
-            Assert.AreEqual(pageResult.PageCount, result.PageCount);
-            Assert.AreEqual(pageResult.NextPage, result.NextPage);
-            Assert.AreEqual(pageResult.Items.Count, result.Items.Count());
-            Assert.AreEqual(contract, result.Items.First());
-
+            
+            Assert.AreEqual(pageResultStub.CurrentPage, result.CurrentPage);
+            Assert.AreEqual(pageResultStub.PageCount, result.PageCount);
+            Assert.AreEqual(pageResultStub.NextPage, result.NextPage);
+            Assert.AreEqual(pageResultStub.Items.Count, result.Items.Count());
+            Assert.AreEqual(contractStub, result.Items.First());
             this.productRepositoryMock.Verify(m => m.GetPage(page), Times.Once());
             this.adapterMock.Verify(m => m.Convert(It.IsAny<Product>()), Times.Once());
         }

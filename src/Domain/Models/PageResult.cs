@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Products.Domain.Exceptions;
 
 namespace Products.Domain.Models
 {
@@ -38,30 +39,6 @@ namespace Products.Domain.Models
             get {
                 return this.items.AsReadOnly();
             }
-        }
-    }
-
-    public class PageCountInvalidException : ArgumentException {
-        private const string MESSAGE = "Page count must be greater than zero";
-        
-        public PageCountInvalidException() : base(MESSAGE)
-        {
-        }
-    }
-
-    public class CurrentPageInvalidException : ArgumentException {
-        private const string MESSAGE = "Current page must be less or equal page count";
-        
-        public CurrentPageInvalidException() : base(MESSAGE)
-        {
-        }
-    }
-
-    public class ItemsInvalidException : ArgumentException {
-        private const string MESSAGE = "Items should be defined";
-        
-        public ItemsInvalidException() : base(MESSAGE)
-        {
         }
     }
 }
